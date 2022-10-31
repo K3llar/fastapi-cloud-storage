@@ -6,8 +6,8 @@ from src.core.logger import LOGGING
 
 
 class Settings(BaseSettings):
-    app_title: str = 'Сервис для создания коротких ссылок'
-    description: str = 'Сделай ссылку которой легко поделиться с друзьями!'
+    app_title: str = 'Сервис для хранения личных файлов'
+    description: str = 'Сохрани все что нужно'
     secret: str
     database_url: str
     project_host: str
