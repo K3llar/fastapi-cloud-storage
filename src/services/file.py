@@ -4,37 +4,15 @@ from uuid import UUID
 from http import HTTPStatus
 
 from fastapi import File, UploadFile, HTTPException
+from fastapi.responses import FileResponse
 
 import src.services.constants as cst
-
-
-# async def upload(file: UploadFile = File(...),
-#                  path: str = '',
-#                  user_id: UUID = None):
-#     file_path = os.getcwd() + cst.USER_FOLDER.format(user_id) + path
-#     os.makedirs(file_path, exist_ok=True)
-#     try:
-#         contents = file.file.read()
-#         file_name = file_path + file.filename.replace(' ', '-')
-#         if os.path.exists(file_name):
-#             print(True)
-#             return HTTPException(
-#                 status_code=HTTPStatus.CONFLICT,
-#                 detail=cst.INPUT_FILE.format(
-#                     path + file.filename.replace(' ', '-')
-#                 )
-#             )
-#         with open(file_name, 'wb') as f:
-#             f.write(contents)
-#     except Exception:
-#         return {'message': 'There was an error uploading file'}
-#     finally:
-#         file.file.close()
+import src.api.validators as vld
 
 
 async def upload(file: UploadFile = File(...),
                  path: str = '',
-                 user_id: UUID = None):
+                 user_id: UUID = None) -> int:
     file_path = os.getcwd() + cst.USER_FOLDER.format(user_id) + path
     try:
         os.makedirs(file_path, exist_ok=True)
@@ -51,13 +29,14 @@ async def upload(file: UploadFile = File(...),
             status_code=HTTPStatus.BAD_REQUEST,
             detail=cst.BAD_FILE
         )
-    if os.path.exists(file_name):
-        raise HTTPException(
-                status_code=HTTPStatus.CONFLICT,
-                detail=cst.EXIST_FILE.format(
-                    path + file.filename.replace(' ', '-')
-                )
-            )
+    await vld.check_file_exist(file_name)
+    # if os.path.exists(file_name):
+    #     raise HTTPException(
+    #             status_code=HTTPStatus.CONFLICT,
+    #             detail=cst.EXIST_FILE.format(
+    #                 path + file.filename.replace(' ', '-')
+    #             )
+    #         )
     try:
         with open(file_name, 'wb') as f:
             f.write(contents)
@@ -68,3 +47,16 @@ async def upload(file: UploadFile = File(...),
         )
     finally:
         file.file.close()
+    file_size = os.stat(file_name).st_size
+    return file_size
+
+
+async def download(path: str = '',
+                   user_id: UUID = None):
+    file_path = os.getcwd() + cst.USER_FOLDER.format(user_id) + path
+    if not os.path.exists(file_path):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f'File <{path}> not found'
+        )
+    return FileResponse(path=file_path)

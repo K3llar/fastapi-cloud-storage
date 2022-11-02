@@ -2,12 +2,16 @@ import os
 
 from fastapi import HTTPException
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from http import HTTPStatus
 
-from src.models.file import FileRegister
+import src.services.constants as cst
 
 
-async def create_folder(path: str):
-    full_path = os.getcwd() + path
+async def check_file_exist(path: str):
+    if os.path.exists(path):
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT,
+            detail=cst.EXIST_FILE.format(
+                path
+            )
+        )

@@ -1,6 +1,7 @@
 import os
 
 from fastapi import APIRouter, File, UploadFile, Depends, Form
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db import get_async_session
@@ -9,25 +10,9 @@ from src.models.file import FileRegister
 from src.schemas.file import FileDB, FileCreate
 from src.schemas.user import UserDB
 
-from src.crud.file import upload_new_file
+from src.crud.file import upload_new_file, file_download
 
 router = APIRouter()
-
-
-# @router.post('/upload')
-# async def upload(file: UploadFile = File(...)):
-#     path = '/storage/user/'
-#     try:
-#         contents = file.file.read()
-#         print(contents.__sizeof__())  # size of file in bytes
-#         file_name = os.getcwd() + path + file.filename.replace(' ', '-')
-#         with open(file_name, 'wb') as f:
-#             f.write(contents)
-#     except Exception:
-#         return {'message': 'There was an error uploading file'}
-#     finally:
-#         file.file.close()
-#     return {'message': f'Successfully uploaded {file.filename}'}
 
 
 @router.post('/upload',
@@ -49,6 +34,18 @@ async def upload_file(
         user
     )
     return new_file
+
+
+@router.post('/download')
+async def download_file(
+        file_schema: FileCreate = Depends(),
+        user: UserDB = Depends(current_user)
+) -> File:
+    file = await file_download(
+        file_schema,
+        user
+    )
+    return file
 
 # @router.post('/upload')
 # async def upload(files: list[UploadFile] = File(...)):
