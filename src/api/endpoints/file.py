@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.db import get_async_session
 from src.core.user import current_user
 from src.models.file import FileRegister
-from src.schemas.file import FileDB, FileCreate
+from src.schemas.file import FileDB, FileCreate, FileDownload
 from src.schemas.user import UserDB
 
 from src.crud.file import upload_new_file, file_download
@@ -38,11 +38,13 @@ async def upload_file(
 
 @router.post('/download')
 async def download_file(
-        file_schema: FileCreate = Depends(),
+        file_schema: FileDownload = Depends(),
+        session: AsyncSession = Depends(get_async_session),
         user: UserDB = Depends(current_user)
 ) -> File:
     file = await file_download(
         file_schema,
+        session,
         user
     )
     return file

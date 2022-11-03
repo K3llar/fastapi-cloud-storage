@@ -11,6 +11,10 @@ class FileCreate(BaseModel):
     path: str = Field(default='')
 
 
+class FileDownload(FileCreate):
+    compression: bool = Field(default=False)
+
+
 class FileDB(FileBase):
     file_id: UUID4
     file_name: str | None

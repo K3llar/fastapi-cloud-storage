@@ -1,10 +1,18 @@
 import os
+import zipfile
+
+import datetime as dt
+
+from io import BytesIO
 from uuid import UUID
 
 from http import HTTPStatus
 
 from fastapi import File, UploadFile, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
+
+from src.schemas.user import UserDB
+from src.schemas.file import FileDownload
 
 import src.services.constants as cst
 import src.api.validators as vld
@@ -30,13 +38,6 @@ async def upload(file: UploadFile = File(...),
             detail=cst.BAD_FILE
         )
     await vld.check_file_exist(file_name)
-    # if os.path.exists(file_name):
-    #     raise HTTPException(
-    #             status_code=HTTPStatus.CONFLICT,
-    #             detail=cst.EXIST_FILE.format(
-    #                 path + file.filename.replace(' ', '-')
-    #             )
-    #         )
     try:
         with open(file_name, 'wb') as f:
             f.write(contents)
@@ -51,12 +52,53 @@ async def upload(file: UploadFile = File(...),
     return file_size
 
 
-async def download(path: str = '',
-                   user_id: UUID = None):
-    file_path = os.getcwd() + cst.USER_FOLDER.format(user_id) + path
+async def download_from_direct_path(req_data: {FileDownload},
+                                    user: UserDB):
+    path, compression = req_data.values()
+    base_folder = os.getcwd() + cst.USER_FOLDER.format(user.id)
+    file_path = base_folder + path
     if not os.path.exists(file_path):
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=f'File <{path}> not found'
+            detail=cst.NOT_FOUND.format(path)
         )
-    return FileResponse(path=file_path)
+    if os.path.isfile(file_path):
+        if not compression:
+            return FileResponse(path=file_path)
+        return await download_zipped(
+            path=path,
+            base_folder=base_folder,
+            file_list=[path, ]
+        )
+    if os.path.isdir(file_path):
+        file_list = [os.path.join(dirpath, f).split(str(user.id))[1] for
+                     (dirpath, dirnames, filenames) in os.walk(file_path)
+                     for f in filenames]
+        return await download_zipped(
+            path=path,
+            base_folder=base_folder,
+            file_list=file_list
+        )
+
+
+async def download_zipped(path: str = 'root',
+                          base_folder: str = None,
+                          file_list: list = None):
+    io = BytesIO()
+    zip_sub_dir = '{}_{}'.format(path, dt.datetime.now())
+    zip_filename = '{}.zip'.format(zip_sub_dir)
+    with zipfile.ZipFile(
+            io,
+            mode='w',
+            compression=zipfile.ZIP_DEFLATED) as zip:
+        for fpath in file_list:
+            zip.write(filename=base_folder + fpath, arcname=fpath)
+        zip.close()
+    return StreamingResponse(
+        iter([io.getvalue()]),
+        media_type='application/x-zip-compressed',
+        headers={
+            'Content-Disposition':
+                'attachment;filename={}'.format(zip_filename)
+        }
+    )

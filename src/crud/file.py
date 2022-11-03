@@ -12,7 +12,7 @@ from src.models.file import FileRegister
 from src.schemas.file import FileCreate
 from src.schemas.user import UserDB
 
-from src.services.file import upload, download
+from src.services.file import upload, download_from_direct_path
 
 
 async def upload_new_file(
@@ -42,8 +42,9 @@ async def upload_new_file(
 
 async def file_download(
         file_schema: FileCreate,
-        user: UserDB
+        session: AsyncSession,
+        user: UserDB,
 ):
     file_data = file_schema.dict()
-    file = await download(file_data['path'], user.id)
+    file = await download_from_direct_path(file_data, user)
     return file
