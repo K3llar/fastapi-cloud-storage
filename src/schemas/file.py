@@ -1,8 +1,7 @@
 import datetime as dt
-
 from enum import Enum
 
-from pydantic import UUID4, BaseModel, Field, conlist
+from pydantic import UUID4, BaseModel, Field
 
 
 class DBFieldsEnum(str, Enum):

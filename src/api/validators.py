@@ -1,15 +1,10 @@
 import os
+from http import HTTPStatus
 
 from fastapi import HTTPException
 
-from http import HTTPStatus
-
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.models.file import FileRegister
-
 import src.services.constants as cst
+from src.models.file import FileRegister
 from src.schemas.user import UserDB
 
 

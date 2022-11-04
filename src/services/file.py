@@ -1,24 +1,20 @@
+import datetime as dt
 import os
 import zipfile
-
-import datetime as dt
-
+from http import HTTPStatus
 from io import BytesIO
 from uuid import UUID
 
-from http import HTTPStatus
-
-from fastapi import File, UploadFile, HTTPException
+from fastapi import File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import FileRegister
-from src.schemas.user import UserDB
-from src.schemas.file import FileDownload
-
-import src.services.constants as cst
 import src.api.validators as vld
+import src.services.constants as cst
+from src.models import FileRegister
+from src.schemas.file import FileDownload
+from src.schemas.user import UserDB
 
 
 async def upload(file: UploadFile = File(...),

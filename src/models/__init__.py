@@ -1,2 +1,2 @@
-from .user import UserTable # noqa
-from .file import FileRegister # noqa
+from .file import FileRegister  # noqa
+from .user import UserTable  # noqa
