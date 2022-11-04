@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.db import get_async_session
 from src.core.user import current_user
 from src.models.file import FileRegister
-from src.schemas.file import FileDB, FileCreate, FileDownload
+from src.schemas.file import FileDB, FileCreate, FileDownload, FileSearch
 from src.schemas.user import UserDB
 
-from src.crud.file import upload_new_file, file_download
+from src.crud.file import upload_new_file, file_download, file_search
 from src.services.file import get_file_links_by_user
 
 router = APIRouter()
@@ -72,6 +72,43 @@ async def get_all_files_by_user(
     """Получение списка всех файлов пользователя"""
     all_files = await get_file_links_by_user(session, user)
     return all_files
+
+
+@router.post('/search',
+             response_model=list[FileDB],
+             response_model_exclude={
+                 'user_id'
+             })
+async def search_files_by_user_param(
+        file_schema: FileSearch,
+        session: AsyncSession = Depends(get_async_session),
+        user: UserDB = Depends(current_user)
+) -> list[FileRegister]:
+    """
+    Поиск файлов пользователя с учетом параметров:
+    search_query - по вхождению строки в имя файла
+    options {
+            path - по расположению (необязательный параметр
+                                    если не указывать, то поиск
+                                    будет по корневому каталогу)
+            extension - по расширению файла (необязательный параметр)
+            order_by - сортировка по полю
+                        file_name - по названию файла, default
+                        create_date - по дате создания
+                        path - по пути
+                        file_size - по размеру файла
+            limit - количество выводимых записей, default = 10
+            }
+    """
+    file_data = file_schema.dict()
+    search_query, options = file_data.values()
+    return await file_search(
+        search_query,
+        options,
+        session,
+        user
+    )
+
 
 # @router.post('/upload')
 # async def upload(files: list[UploadFile] = File(...)):

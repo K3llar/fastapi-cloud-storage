@@ -1,6 +1,7 @@
 import uuid
 from http import HTTPStatus
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import UploadFile, HTTPException
@@ -8,7 +9,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 
 import src.services.constants as cst
 from src.models import FileRegister
-from src.schemas.file import FileCreate
+from src.schemas.file import FileCreate, FileSearch
 from src.schemas.user import UserDB
 
 from src.services.file import (upload,
@@ -56,4 +57,36 @@ async def file_download(
     return file
 
 
+# async def file_search(
+#         search_query: str,
+#         options: dict,
+#         session: AsyncSession,
+#         user: UserDB,
+# ) -> list[FileRegister]:
+#     files = await session.execute(
+#         select(FileRegister).where(
+#             FileRegister.user_id == user.id
+#         ).where(
+#             FileRegister.path.startswith(options.get('path'))
+#         )
+#     )
+#     files = files.scalars().all()
+#     return files
 
+
+async def file_search(
+        search_query: str,
+        options: dict,
+        session: AsyncSession,
+        user: UserDB,
+) -> list[FileRegister]:
+    files = await session.execute(
+        select(FileRegister).where(
+            FileRegister.user_id == user.id,
+            FileRegister.path.startswith(options.get('path')),
+            FileRegister.file_name.endswith(options.get('extension'))
+        ).filter(FileRegister.file_name.contains(search_query)
+                 ).limit(options.get('limit')
+                         ).order_by(options.get('order_by')))
+    files = files.scalars().all()
+    return files
