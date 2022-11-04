@@ -7,7 +7,7 @@ from fastapi import UploadFile, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 
 import src.services.constants as cst
-from src.models.file import FileRegister
+from src.models import FileRegister
 from src.schemas.file import FileCreate
 from src.schemas.user import UserDB
 
@@ -54,3 +54,6 @@ async def file_download(
     except ValueError:
         file = await download_from_direct_path(file_data, user)
     return file
+
+
+

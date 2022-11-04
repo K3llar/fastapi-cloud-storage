@@ -11,6 +11,7 @@ from src.schemas.file import FileDB, FileCreate, FileDownload
 from src.schemas.user import UserDB
 
 from src.crud.file import upload_new_file, file_download
+from src.services.file import get_file_links_by_user
 
 router = APIRouter()
 
@@ -42,12 +43,35 @@ async def download_file(
         session: AsyncSession = Depends(get_async_session),
         user: UserDB = Depends(current_user)
 ) -> File:
+    """
+    Загрузка файла из хранилища.
+    Допускается загрузка через указание полного пути до файла
+    или UUID записи.
+    Для загрузки единичного файла присутствует опция загрузки
+    в виде zip-архива.
+    Загрузка каталога осуществляется только полному пути и
+    скачивание происходит только в виде zip-архива.
+    """
     file = await file_download(
         file_schema,
         session,
         user
     )
     return file
+
+
+@router.get('/list',
+            response_model=list[FileDB],
+            response_model_exclude={
+                'user_id'
+            })
+async def get_all_files_by_user(
+        session: AsyncSession = Depends(get_async_session),
+        user: UserDB = Depends(current_user)
+) -> list[FileRegister]:
+    """Получение списка всех файлов пользователя"""
+    all_files = await get_file_links_by_user(session, user)
+    return all_files
 
 # @router.post('/upload')
 # async def upload(files: list[UploadFile] = File(...)):

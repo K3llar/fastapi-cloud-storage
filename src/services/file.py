@@ -142,3 +142,16 @@ async def download_zipped(path: str = 'root',
                 'attachment;filename={}'.format(zip_filename)
         }
     )
+
+
+async def get_file_links_by_user(
+        session: AsyncSession,
+        user: UserDB
+) -> list[FileRegister]:
+    all_files = await session.execute(
+        select(FileRegister).where(
+            FileRegister.user_id == user.id
+        )
+    )
+    all_files = all_files.scalars().all()
+    return all_files
