@@ -1,18 +1,19 @@
-import os
+import uuid
 from http import HTTPStatus
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import UploadFile, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 import src.services.constants as cst
 from src.models.file import FileRegister
 from src.schemas.file import FileCreate
 from src.schemas.user import UserDB
 
-from src.services.file import upload, download_from_direct_path
+from src.services.file import (upload,
+                               download_from_direct_path,
+                               download_from_uuid)
 
 
 async def upload_new_file(
@@ -44,7 +45,12 @@ async def file_download(
         file_schema: FileCreate,
         session: AsyncSession,
         user: UserDB,
-):
+) -> FileResponse | StreamingResponse:
     file_data = file_schema.dict()
-    file = await download_from_direct_path(file_data, user)
+    path = file_data.get('path')
+    try:
+        uuid.UUID(path)
+        file = await download_from_uuid(file_data, user, session)
+    except ValueError:
+        file = await download_from_direct_path(file_data, user)
     return file

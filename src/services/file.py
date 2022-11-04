@@ -10,7 +10,10 @@ from http import HTTPStatus
 
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.models import FileRegister
 from src.schemas.user import UserDB
 from src.schemas.file import FileDownload
 
@@ -52,8 +55,10 @@ async def upload(file: UploadFile = File(...),
     return file_size
 
 
-async def download_from_direct_path(req_data: {FileDownload},
-                                    user: UserDB):
+async def download_from_direct_path(
+        req_data: {FileDownload},
+        user: UserDB
+) -> File:
     path, compression = req_data.values()
     base_folder = os.getcwd() + cst.USER_FOLDER.format(user.id)
     file_path = base_folder + path
@@ -79,6 +84,41 @@ async def download_from_direct_path(req_data: {FileDownload},
             base_folder=base_folder,
             file_list=file_list
         )
+
+
+async def download_from_uuid(
+        req_data: {FileDownload},
+        user: UserDB,
+        session: AsyncSession
+) -> File:
+    obj_id, compression = req_data.values()
+    base_folder = os.getcwd() + cst.USER_FOLDER.format(user.id)
+    file = await get_file_by_id(obj_id, session)
+    await vld.check_file_owner(file, user)
+    file_path = file.path
+    if compression:
+        return await download_zipped(
+            path=file_path,
+            base_folder=base_folder,
+            file_list=[file_path, ]
+        )
+    return FileResponse(path=base_folder + file.path)
+
+
+async def get_file_by_id(
+        obj_id: str,
+        session: AsyncSession
+) -> FileRegister:
+    file = await session.execute(select(FileRegister).where(
+        FileRegister.file_id == obj_id
+    ))
+    file = file.scalars().first()
+    if not file:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=cst.NOT_FOUND.format(obj_id)
+        )
+    return file
 
 
 async def download_zipped(path: str = 'root',
