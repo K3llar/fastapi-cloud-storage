@@ -1,7 +1,7 @@
 import uuid
 from http import HTTPStatus
 
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, UploadFile, File
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,18 +20,19 @@ async def upload_new_file(
         session: AsyncSession,
         user: UserDB
 ) -> FileRegister:
-    if file:
-        new_file_data = file_schema.dict()
-        file_size = await upload(file, new_file_data['path'], user.id)
-        new_file_data['user_id'] = user.id
-        new_file_data['file_name'] = file.filename.replace(' ', '-')
-        new_file_data['path'] += new_file_data['file_name']
-        new_file_data['file_size'] = file_size
-    else:
+    if not file:
         raise HTTPException(
             status_code=HTTPStatus.EXPECTATION_FAILED,
             detail=cst.INPUT_FILE
         )
+    new_file_data = file_schema.dict()
+    ans = await upload(
+        file, new_file_data['path'], user.id
+    )
+    new_file_data['user_id'] = user.id
+    new_file_data['file_name'] = file.filename.replace(' ', '-')
+    new_file_data['path'] = ans.get('file_path')
+    new_file_data['file_size'] = ans.get('file_size')
     db_file = FileRegister(**new_file_data)
     session.add(db_file)
     await session.commit()

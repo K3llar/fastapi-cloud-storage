@@ -1,4 +1,7 @@
 import os
+
+from pathlib import Path
+
 from http import HTTPStatus
 
 from fastapi import HTTPException
@@ -8,14 +11,19 @@ from src.models.file import FileRegister
 from src.schemas.user import UserDB
 
 
-async def check_file_exist(path: str):
-    if os.path.exists(path):
+async def check_file_exist(path: Path):
+    if Path(path).exists():
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
             detail=cst.EXIST_FILE.format(
                 path
             )
         )
+
+
+async def check_folder_exist(path: Path):
+    if not Path(path).exists():
+        Path(path).mkdir(parents=True, exist_ok=True)
 
 
 async def check_file_owner(
