@@ -11,7 +11,7 @@ services:
       - ./.env
 
   backend:
-    build: .
+    image: k3llar/cloud_fastapi:latest
     restart: always
     volumes:
       - media_value:/app/media/
