@@ -61,7 +61,7 @@ async def download_from_direct_path(
     path, compression = req_data.values()
     base_folder = cst.BASE_FOLDER / cst.USER_FOLDER.format(user.id)
     file_path = base_folder / path
-    if not Path(file_path).exists():
+    if not file_path.exists():
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail=cst.NOT_FOUND.format(path)
@@ -74,7 +74,7 @@ async def download_from_direct_path(
             base_folder=base_folder,
             file_list=[path, ]
         )
-    if file_path.is_dir():
+    elif file_path.is_dir():
         file_list = [os.path.join(dirpath, f).split(str(user.id))[1] for
                      (dirpath, dirnames, filenames) in os.walk(file_path)
                      for f in filenames]
