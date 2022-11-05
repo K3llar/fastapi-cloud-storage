@@ -1,8 +1,5 @@
-import os
-
-from pathlib import Path
-
 from http import HTTPStatus
+from pathlib import Path
 
 from fastapi import HTTPException
 

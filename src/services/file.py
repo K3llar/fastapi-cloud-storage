@@ -3,6 +3,7 @@ import os
 import zipfile
 from http import HTTPStatus
 from io import BytesIO
+from pathlib import Path
 from uuid import UUID
 
 import aiofiles
@@ -16,8 +17,6 @@ import src.services.constants as cst
 from src.models import FileRegister
 from src.schemas.file import FileDownload
 from src.schemas.user import UserDB
-
-from pathlib import Path
 
 
 async def upload(file: UploadFile = File(...),

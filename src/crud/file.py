@@ -1,7 +1,7 @@
 import uuid
 from http import HTTPStatus
 
-from fastapi import HTTPException, UploadFile, File
+from fastapi import HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

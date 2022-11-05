@@ -1,6 +1,5 @@
 import pathlib
 
-
 """TEMPLATES"""
 EMPTY_FIELD = 'Field <{}> must be filled'
 EXIST_FILE = 'File <{}> already exists'
