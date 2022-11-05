@@ -6,11 +6,11 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import src.services.constants as cst
-from src.models import FileRegister
-from src.schemas.file import FileCreate
-from src.schemas.user import UserDB
-from src.services.file import (download_from_direct_path, download_from_uuid,
+import services.constants as cst
+from models import FileRegister
+from schemas.file import FileCreate
+from schemas.user import UserDB
+from services.file import (download_from_direct_path, download_from_uuid,
                                upload)
 
 

@@ -10,11 +10,11 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import src.api.validators as vld
-import src.services.constants as cst
-from src.models import FileRegister
-from src.schemas.file import FileDownload
-from src.schemas.user import UserDB
+import api.validators as vld
+import services.constants as cst
+from models import FileRegister
+from schemas.file import FileDownload
+from schemas.user import UserDB
 
 
 async def upload(file: UploadFile = File(...),

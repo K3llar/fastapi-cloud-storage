@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import FileRegister
-from src.schemas.user import UserDB
+from models import FileRegister
+from schemas.user import UserDB
 
 
 async def get_links_by_user(

@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
 
-from src.core.user import auth_backend, fastapi_users
+from core.user import auth_backend, fastapi_users
 
 router = APIRouter()
 

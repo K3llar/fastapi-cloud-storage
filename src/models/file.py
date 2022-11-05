@@ -5,7 +5,7 @@ from fastapi_users_db_sqlalchemy.guid import GUID
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy_utils import UUIDType
 
-from src.core.db import Base
+from core.db import Base
 
 
 class FileRegister(Base):

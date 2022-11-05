@@ -3,9 +3,9 @@ from http import HTTPStatus
 
 from fastapi import HTTPException
 
-import src.services.constants as cst
-from src.models.file import FileRegister
-from src.schemas.user import UserDB
+import services.constants as cst
+from models.file import FileRegister
+from schemas.user import UserDB
 
 
 async def check_file_exist(path: str):

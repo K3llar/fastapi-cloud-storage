@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db import get_async_session
-from src.core.user import current_user
-from src.crud.file import file_download, file_search, upload_new_file
-from src.models.file import FileRegister
-from src.schemas.file import FileCreate, FileDB, FileDownload, FileSearch
-from src.schemas.user import UserDB
-from src.services.file import get_file_links_by_user
+from core.db import get_async_session
+from core.user import current_user
+from crud.file import file_download, file_search, upload_new_file
+from models.file import FileRegister
+from schemas.file import FileCreate, FileDB, FileDownload, FileSearch
+from schemas.user import UserDB
+from services.file import get_file_links_by_user
 
 router = APIRouter()
 

@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 
-from src.api.routers import main_router
-from src.core.config import settings
-from src.core.init_db import create_first_superuser
+from api.routers import main_router
+from core.config import settings
+from core.init_db import create_first_superuser
 
 app = FastAPI(title=settings.app_title,
               description=settings.description)

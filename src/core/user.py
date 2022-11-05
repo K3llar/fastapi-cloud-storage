@@ -8,11 +8,11 @@ from fastapi_users.authentication import (AuthenticationBackend,
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.config import settings
-from src.core.db import get_async_session
-from src.core.logger import LOG_FORMAT, LOG_NAME
-from src.models.user import UserTable
-from src.schemas.user import User, UserCreate, UserDB, UserUpdate
+from core.config import settings
+from core.db import get_async_session
+from core.logger import LOG_FORMAT, LOG_NAME
+from models.user import UserTable
+from schemas.user import User, UserCreate, UserDB, UserUpdate
 
 logging.basicConfig(
     level=logging.INFO,
