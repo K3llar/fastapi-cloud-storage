@@ -46,6 +46,8 @@ jobs:
             sudo rm .env
             touch .env
             echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
+            echo PROJECT_HOST=${{ secrets.PROJECT_HOST }} >> .env
+            echo PROJECT_PORT=${{ secrets.PROJECT_PORT }} >> .env
             echo FIRST_SUPERUSER_EMAIL=${{ secrets.FIRST_SUPERUSER_EMAIL }} >> .env
             echo FIRST_SUPERUSER_PASSWORD=${{ secrets.FIRST_SUPERUSER_PASSWORD }} >> .env
             echo SECRET=${{ secrets.SECRET }} >> .env

@@ -6,4 +6,4 @@ COPY requirements.txt .
 RUN python -m pip install --upgrade pip \
     && pip install -r /code/requirements.txt
 COPY . .
-CMD uvicorn src.main:app
+CMD python3 src/main.py
