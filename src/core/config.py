@@ -1,6 +1,6 @@
 from logging import config as logging_config
 
-from pydantic import BaseSettings, EmailStr
+from pydantic import BaseSettings, EmailStr, PostgresDsn
 
 from core.logger import LOGGING
 
@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     app_title: str = 'Сервис для хранения личных файлов'
     description: str = 'Сохрани все что нужно'
     secret: str
-    database_url: str
+    database_url: PostgresDsn
     project_host: str
     project_port: str
     first_superuser_email: EmailStr | None = None
