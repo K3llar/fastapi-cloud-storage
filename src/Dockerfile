@@ -6,4 +6,4 @@ COPY requirements.txt .
 RUN python -m pip install --upgrade pip \
     && pip install -r /code/requirements.txt
 COPY . .
-CMD python3 src/main.py
+CMD python3 main.py
