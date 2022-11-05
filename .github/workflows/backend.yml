@@ -46,8 +46,7 @@ jobs:
             sudo rm .env
             touch .env
             echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
-            echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+            echo FIRST_SUPERUSER_EMAIL=${{ secrets.FIRST_SUPERUSER_EMAIL }} >> .env
+            echo FIRST_SUPERUSER_PASSWORD=${{ secrets.FIRST_SUPERUSER_PASSWORD }} >> .env
+            echo SECRET=${{ secrets.SECRET }} >> .env
             sudo docker-compose -f docker-compose.yml up -d
